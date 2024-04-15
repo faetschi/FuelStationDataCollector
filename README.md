@@ -1,5 +1,8 @@
-# Distributed Systems Semester Project
-An example setup for a Distributed Systems project. It contains five databases (PostgreSQL) with example data and a messaging queue (RabbitMQ).
+# Fuel Station Data Collector
+### A Distributed Systems Semester Project
+Made by Fabian Jelinek, Hayk Sargsyan and Marco Hudec
+
+It contains five databases (PostgreSQL) with example data and a messaging queue (RabbitMQ).
 
 ## Services
 - Customer Database
