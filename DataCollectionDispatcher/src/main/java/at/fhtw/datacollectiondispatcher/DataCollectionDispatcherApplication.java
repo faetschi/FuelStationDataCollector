@@ -1,4 +1,4 @@
-package com.example.datacollectiondispatcher;
+package at.fhtw.datacollectiondispatcher;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
