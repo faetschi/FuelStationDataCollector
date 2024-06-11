@@ -1,7 +1,6 @@
 package at.fhtw.springbootapp.controller;
 
 import at.fhtw.springbootapp.RabbitMQSender;
-import at.fhtw.springbootapp.entity.InvoiceEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,11 +21,6 @@ public class InvoiceController {
 
     @GetMapping("/{customerId}")
     public ResponseEntity<?> getInvoice(@PathVariable String customerId) {
-        InvoiceEntity invoice = new InvoiceEntity();
-        if (invoice == null) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok(invoice);
-        }
+          return new ResponseEntity<>("Invoice for customer " + customerId, HttpStatus.OK);
     }
 }

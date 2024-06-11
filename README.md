@@ -36,3 +36,10 @@ docker-compose up
 
 ## Documentations
 - [RabbitMQ](https://www.rabbitmq.com/tutorials/tutorial-one-java.html)
+
+
+For checking Databases:
+stationsdb:
+docker exec -it semesterproject-station-db-1 psql -U postgres -d stationdb
+station-1-db:
+docker exec -it semesterproject-station-1-db-1 psql -U postgres -d stationdb
