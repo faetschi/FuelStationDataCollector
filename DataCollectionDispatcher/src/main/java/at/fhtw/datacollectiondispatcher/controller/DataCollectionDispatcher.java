@@ -27,6 +27,11 @@ public class DataCollectionDispatcher {
     @Autowired
     private StationRepository stationRepository;
 
+    public DataCollectionDispatcher(RabbitTemplate rabbitTemplate, StationRepository stationRepository) {
+        this.rabbitTemplate = rabbitTemplate;
+        this.stationRepository = stationRepository;
+    }
+
     // listens to data collection jobs queue
     @RabbitListener(queues = RabbitMQConfig.DATA_COLLECTION_JOBS_QUEUE)
     public void receiveMessage(@Payload String customerId) {
@@ -41,6 +46,7 @@ public class DataCollectionDispatcher {
             message.put("customerId", customerId);
             message.put("dbUrl", station.getDbUrl().toString());
             System.out.println(customerId);
+            System.out.println(station.getDbUrl().toString());
 
             rabbitTemplate.convertAndSend(RabbitMQConfig.STATION_DATA_COLLECTOR_QUEUE, message);
         });
