@@ -1,0 +1,34 @@
+package at.fhtw.pdfgenerator.entity;
+
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "customer")
+public class CustomerEntity {
+
+    @Id
+    private Integer id;
+    private String firstName;
+    private String lastName;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+}
