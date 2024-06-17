@@ -39,12 +39,14 @@ public class DataCollectionReceiver {
 
     private void processData(double sum, int customerId, int stationPort) {
         // Sort the data according to the gathering job
-        dataMap.put(stationPort, dataMap.getOrDefault(stationPort, 0.0) + sum);
+        dataMap.put(stationPort, sum);
 
         // Check if the data is complete
         if (isDataComplete()) {
             // Send data to the PDF Generator
             sendToPdfGenerator(dataMap);
+            // Clear the dataMap after sending the data
+            dataMap.clear();
         }
     }
 
