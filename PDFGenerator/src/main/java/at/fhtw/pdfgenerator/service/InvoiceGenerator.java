@@ -20,7 +20,7 @@ public class InvoiceGenerator {
 
     private String fileStoragePath = ".." + File.separator + "FileStorage";
     private int invoiceCounter = 0;
-    public void createInvoice(Map<String, Double> data, String firstName, String lastName) {
+    public void createInvoice(Map<String, Double> data, String firstName, String lastName, int customerId) {
         try {
             // Specify the folder where the PDF should be saved
             File directory = new File(fileStoragePath);
@@ -31,7 +31,7 @@ public class InvoiceGenerator {
             invoiceCounter++;
 
             // Initialize PDF writer
-            PdfWriter writer = new PdfWriter(directory.toString() + File.separator + "invoice" + invoiceCounter + ".pdf");
+            PdfWriter writer = new PdfWriter(directory.toString() + File.separator + "invoice_" + customerId + "_" + invoiceCounter + ".pdf");
 
             // Initialize PDF document
             PdfDocument pdf = new PdfDocument(writer);
@@ -64,6 +64,7 @@ public class InvoiceGenerator {
             e.printStackTrace();
         }
     }
+
 
     private Cell getHeaderCell(String text) throws IOException {
         return new Cell().add(new Paragraph(text)

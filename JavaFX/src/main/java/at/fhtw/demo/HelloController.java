@@ -1,16 +1,22 @@
 package at.fhtw.demo;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 import javafx.concurrent.Task;
+
+import java.awt.Desktop;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
-import java.time.Duration;
-
 
 public class HelloController {
 
@@ -38,23 +44,26 @@ public class HelloController {
                 .POST(HttpRequest.BodyPublishers.noBody())
                 .build();
 
-        httpClient.sendAsync(request, BodyHandlers.ofString())
+        httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenAccept(response -> {
                     if (response.statusCode() == 200) {
-                        statusLabel.setText("Invoice generation started for Customer ID: " + customerId);
-                        startPeriodicCheck(customerId);
+                        Platform.runLater(() -> {
+                            statusLabel.setText("Invoice generation started for Customer ID: " + customerId);
+                            startPeriodicCheck(customerId); // Start checking for invoice status
+                        });
                     } else {
-                        statusLabel.setText("Failed to start invoice generation.");
+                        Platform.runLater(() -> statusLabel.setText("Failed to start invoice generation."));
                     }
                 })
                 .exceptionally(e -> {
-                    statusLabel.setText("Error: " + e.getMessage());
+                    Platform.runLater(() -> statusLabel.setText("Error: " + e.getMessage()));
                     return null;
                 });
     }
 
     private void startPeriodicCheck(String customerId) {
         Task<Void> checkTask = new Task<>() {
+            @Override
             protected Void call() throws Exception {
                 while (true) {
                     HttpRequest request = HttpRequest.newBuilder()
@@ -62,18 +71,67 @@ public class HelloController {
                             .GET()
                             .build();
 
-                    HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
-                    if (response.statusCode() == 200) {
-                        updateMessage("Invoice ready: " + response.body());
-                        break;
-                    }
-                    Thread.sleep(5000); // Check every 5 seconds
+                    httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                            .thenAccept(response -> {
+                                if (response.statusCode() == 200) {
+                                    String responseBody = response.body();
+                                    if (responseBody.startsWith("file://")) {
+                                        Platform.runLater(() -> {
+                                            statusLabel.setText("Invoice is ready for Customer ID: " + customerId);
+                                            createDownloadButton(responseBody);
+                                        });
+                                        cancel(); // Stop periodic checking
+                                    }
+                                }
+                            })
+                            .exceptionally(e -> {
+                                e.printStackTrace();
+                                return null;
+                            });
+
+                    Thread.sleep(1000); // Check every 1 second
                 }
-                return null;
             }
         };
-        statusLabel.textProperty().bind(checkTask.messageProperty());
         new Thread(checkTask).start();
     }
-}
 
+    private Button downloadButton;
+
+    private void createDownloadButton(String downloadLink) {
+        // Remove existing download button if it exists
+        if (downloadButton != null) {
+            ((VBox) statusLabel.getParent()).getChildren().remove(downloadButton);
+        }
+
+        downloadButton = new Button("Download Invoice");
+        downloadButton.setOnAction(e -> {
+            try {
+                URI uri = new URI(downloadLink);
+
+                if (uri.getScheme().equals("file")) {
+                    // Handle local file URL
+                    File file = new File(uri);
+                    if (file.exists()) {
+                        Desktop.getDesktop().open(file);
+                    } else {
+                        throw new FileNotFoundException("File not found: " + file);
+                    }
+                } else {
+                    // Handle web URL
+                    if (Desktop.isDesktopSupported()) {
+                        Desktop.getDesktop().browse(uri);
+                    } else {
+                        throw new UnsupportedOperationException("Desktop browsing not supported.");
+                    }
+                }
+            } catch (IOException | URISyntaxException | UnsupportedOperationException ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        ((VBox) statusLabel.getParent()).getChildren().add(downloadButton);
+    }
+
+
+}

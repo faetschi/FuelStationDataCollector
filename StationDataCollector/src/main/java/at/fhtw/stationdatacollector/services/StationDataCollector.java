@@ -41,47 +41,52 @@ public class StationDataCollector {
 
     @RabbitListener(queues = RabbitMQConfig.STATION_DATA_COLLECTOR_QUEUE)
     public void receiveCustomerData(Map<String, String> message) {
-        int customerId = Integer.parseInt(message.get("customerId"));
-        String dbUrl = message.get("dbUrl");
+        try {
+            int customerId = Integer.parseInt(message.get("customerId"));
+            String dbUrl = message.get("dbUrl");
 
-        String sql = "SELECT id, kwh, customer_id FROM charge WHERE customer_id = ?";
+            String sql = "SELECT id, kwh, customer_id FROM charge WHERE customer_id = ?";
 
-        List<ChargeEntity> chargeEntities = new ArrayList<>();
-        String stationPort = "";
+            List<ChargeEntity> chargeEntities = new ArrayList<>();
+            String stationPort = "";
 
-        if (dbUrl.contains("30011")) {
-            chargeEntities = jdbcTemplate1.query(sql, (ResultSet rs, int rowNum) -> new ChargeEntity(
-                    rs.getInt("id"),
-                    rs.getDouble("kwh"),
-                    rs.getInt("customer_id")
-            ), customerId);
-            stationPort = "30011";
-        } else if (dbUrl.contains("30012")) {
-            chargeEntities = jdbcTemplate2.query(sql, (ResultSet rs, int rowNum) -> new ChargeEntity(
-                    rs.getInt("id"),
-                    rs.getDouble("kwh"),
-                    rs.getInt("customer_id")
-            ), customerId);
-            stationPort = "30012";
-        } else if (dbUrl.contains("30013")) {
-            chargeEntities = jdbcTemplate3.query(sql, (ResultSet rs, int rowNum) -> new ChargeEntity(
-                    rs.getInt("id"),
-                    rs.getDouble("kwh"),
-                    rs.getInt("customer_id")
-            ), customerId);
-            stationPort = "30013";
-        } else {
-            log.error("Invalid station port in dbUrl: {}", dbUrl);
-            // Handle the error accordingly
+            if (dbUrl.contains("30011")) {
+                chargeEntities = jdbcTemplate1.query(sql, (ResultSet rs, int rowNum) -> new ChargeEntity(
+                        rs.getInt("id"),
+                        rs.getDouble("kwh"),
+                        rs.getInt("customer_id")
+                ), customerId);
+                stationPort = "30011";
+            } else if (dbUrl.contains("30012")) {
+                chargeEntities = jdbcTemplate2.query(sql, (ResultSet rs, int rowNum) -> new ChargeEntity(
+                        rs.getInt("id"),
+                        rs.getDouble("kwh"),
+                        rs.getInt("customer_id")
+                ), customerId);
+                stationPort = "30012";
+            } else if (dbUrl.contains("30013")) {
+                chargeEntities = jdbcTemplate3.query(sql, (ResultSet rs, int rowNum) -> new ChargeEntity(
+                        rs.getInt("id"),
+                        rs.getDouble("kwh"),
+                        rs.getInt("customer_id")
+                ), customerId);
+                stationPort = "30013";
+            } else {
+                log.error("Invalid station port in dbUrl: {}", dbUrl);
+                // Handle the error accordingly
+            }
+
+            double totalKwh = chargeEntities.stream()
+                    .mapToDouble(ChargeEntity::getKwh)
+                    .sum();
+
+            String resultMessage = "sum:" + totalKwh + ",customerId:" + customerId + ",stationPort:" + stationPort;
+            System.out.println(resultMessage);
+            rabbitTemplate.convertAndSend(RabbitMQConfig.SPECIFIC_DATA_COLLECTION_RECEIVER_QUEUE, resultMessage);
+        } catch (NumberFormatException e) {
+            log.error("Invalid customerId in message: {}", message);
         }
 
-        double totalKwh = chargeEntities.stream()
-                .mapToDouble(ChargeEntity::getKwh)
-                .sum();
-
-        String resultMessage = "sum:" + totalKwh + ",customerId:" + customerId + ",stationPort:" + stationPort;
-        System.out.println(resultMessage);
-        rabbitTemplate.convertAndSend(RabbitMQConfig.SPECIFIC_DATA_COLLECTION_RECEIVER_QUEUE, resultMessage);
     }
 
 }
