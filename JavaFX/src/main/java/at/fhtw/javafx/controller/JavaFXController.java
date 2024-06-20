@@ -1,4 +1,4 @@
-package at.fhtw.demo;
+package at.fhtw.javafx.controller;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -24,7 +24,7 @@ import javafx.scene.control.ProgressIndicator;
 
 
 
-public class HelloController {
+public class JavaFXController {
 
     @FXML
     private TextField customerIdField;
