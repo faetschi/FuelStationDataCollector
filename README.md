@@ -17,5 +17,5 @@ docker-compose up
 - also start JavaFX application to start the invoice PDF generation 
 
 In the JavaFX application:
-- Enter a customerID (1-3)
+- Enter a customerID (e.g. 1-3 are valid)
 - A download button appears: download the invoice.pdf for the selected customer
