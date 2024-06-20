@@ -59,7 +59,7 @@ class SpringBootAppApplicationTests {
         InvoiceController invoiceControllerSpy = spy(invoiceController);
 
         // Mocking the behavior of findHighestInvoiceCounter method in the spy
-        doReturn(2).when(invoiceControllerSpy).findHighestInvoiceCounter(anyString(), anyString());
+        doReturn(1).when(invoiceControllerSpy).findHighestInvoiceCounter(anyString(), anyString());
 
         int highestInvoiceNumber = invoiceControllerSpy.findHighestInvoiceCounter(rootDirectory + "/../FileStorage", customerId);
 
