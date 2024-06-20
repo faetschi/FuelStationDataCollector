@@ -18,7 +18,7 @@ import java.util.Map;
 @Service
 public class InvoiceGenerator {
 
-    private String fileStoragePath = ".." + File.separator + "FileStorage";
+    String fileStoragePath = ".." + File.separator + "FileStorage";
     private int invoiceCounter = 0;
     public void createInvoice(Map<String, Double> data, String firstName, String lastName, int customerId) {
         try {

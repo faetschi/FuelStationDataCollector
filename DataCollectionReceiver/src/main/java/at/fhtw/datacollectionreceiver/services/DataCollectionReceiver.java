@@ -17,7 +17,7 @@ public class DataCollectionReceiver {
     static final int EXPECTED_NUMBER_OF_STATIONS = 3;
 
     @Autowired
-    private RabbitTemplate rabbitTemplate;
+    protected RabbitTemplate rabbitTemplate;
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
