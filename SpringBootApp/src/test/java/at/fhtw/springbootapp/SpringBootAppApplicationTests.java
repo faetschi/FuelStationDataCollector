@@ -8,11 +8,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -51,7 +52,21 @@ class SpringBootAppApplicationTests {
 
     @Test
     public void testGetEndpoint() throws Exception {
+        String customerId = "1";
+        String rootDirectory = System.getProperty("user.dir").replace("\\", "/").replace(" ", "%20");
+        String expectedResponse = "file:///" + rootDirectory + "/../FileStorage/invoice_" + customerId +"_1.pdf";
 
+        // Create a spy of the InvoiceController
+        InvoiceController invoiceControllerSpy = spy(invoiceController);
+
+        // Mocking the behavior of findHighestInvoiceCounter method in the spy
+        doReturn(1).when(invoiceControllerSpy).findHighestInvoiceCounter(anyString(), anyString());
+
+        // Perform the GET request
+        mockMvc.perform(get("/invoices/" + customerId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().string(expectedResponse));
     }
 
 
