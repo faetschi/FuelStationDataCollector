@@ -7,6 +7,8 @@ Made by Fabian Jelinek, Hayk Sargsyan and Marco Hudec
 
 ## Start
 
+In FuelStationDataCollector, open up the terminal and execute:
+
 ```shell
 docker-compose up
 ```
