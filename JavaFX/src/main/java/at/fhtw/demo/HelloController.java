@@ -17,6 +17,12 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import javafx.scene.control.TextFormatter;
+import javafx.scene.control.ProgressIndicator;
+
+
+
+
 
 public class HelloController {
 
@@ -28,6 +34,10 @@ public class HelloController {
     private static final String API_URL = "http://localhost:8080/invoices/";
 
     @FXML
+    private ProgressIndicator progressIndicator;
+
+
+    @FXML
     protected void generateInvoice() {
         String customerId = customerIdField.getText();
         if (!customerId.isEmpty()) {
@@ -37,6 +47,18 @@ public class HelloController {
         }
     }
 
+    @FXML
+    public void initialize() {
+        TextFormatter<String> numericFormatter = new TextFormatter<>(change -> {
+            if (change.getControlNewText().matches("\\d*")) {
+                return change;
+            }
+            return null;
+        });
+        customerIdField.setTextFormatter(numericFormatter);
+    }
+
+
     private void sendStartInvoiceRequest(String customerId) {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(API_URL + customerId))
@@ -44,22 +66,35 @@ public class HelloController {
                 .POST(HttpRequest.BodyPublishers.noBody())
                 .build();
 
+        Platform.runLater(() -> {
+            progressIndicator.setVisible(true); // Show loading when request starts
+            statusLabel.setText("Starting invoice generation for Customer ID: " + customerId);
+        });
+
         httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenAccept(response -> {
                     if (response.statusCode() == 200) {
                         Platform.runLater(() -> {
                             statusLabel.setText("Invoice generation started for Customer ID: " + customerId);
-                            startPeriodicCheck(customerId); // Start checking for invoice status
+                            startPeriodicCheck(customerId); // Continue to show loading icon
                         });
                     } else {
-                        Platform.runLater(() -> statusLabel.setText("Failed to start invoice generation."));
+                        Platform.runLater(() -> {
+                            statusLabel.setText("Failed to start invoice generation.");
+                            progressIndicator.setVisible(false); // Hide loading if failed to start
+                        });
                     }
                 })
                 .exceptionally(e -> {
-                    Platform.runLater(() -> statusLabel.setText("Error: " + e.getMessage()));
+                    Platform.runLater(() -> {
+                        statusLabel.setText("Error: " + e.getMessage());
+                        progressIndicator.setVisible(false); // Hide loading on error
+                    });
                     return null;
                 });
     }
+
+
 
     private void startPeriodicCheck(String customerId) {
         Task<Void> checkTask = new Task<>() {
@@ -79,6 +114,7 @@ public class HelloController {
                                         Platform.runLater(() -> {
                                             statusLabel.setText("Invoice is ready for Customer ID: " + customerId);
                                             createDownloadButton(responseBody);
+                                            progressIndicator.setVisible(false); // Hide loading when download is ready
                                         });
                                         cancel(); // Stop periodic checking
                                     }
@@ -95,6 +131,7 @@ public class HelloController {
         };
         new Thread(checkTask).start();
     }
+
 
     private Button downloadButton;
 
