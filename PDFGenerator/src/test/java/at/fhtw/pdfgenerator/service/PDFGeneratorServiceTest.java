@@ -27,6 +27,10 @@ public class PDFGeneratorServiceTest {
     private PDFGeneratorService pdfGeneratorService;
 
     @Test
+    void contextLoads() {
+    }
+
+    @Test
     public void testReceiveMessage() throws Exception {
         CustomerEntity customer = new CustomerEntity();
         customer.setId(1);
