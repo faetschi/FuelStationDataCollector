@@ -5,6 +5,8 @@ module at.fhtw.demo {
     requires java.desktop;
 
 
-    opens at.fhtw.demo to javafx.fxml;
-    exports at.fhtw.demo;
+    opens at.fhtw.javafx to javafx.fxml;
+    exports at.fhtw.javafx;
+    exports at.fhtw.javafx.controller;
+    opens at.fhtw.javafx.controller to javafx.fxml;
 }
