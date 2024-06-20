@@ -2,44 +2,18 @@
 ### A Distributed Systems Semester Project
 Made by Fabian Jelinek, Hayk Sargsyan and Marco Hudec
 
-It contains five databases (PostgreSQL) with example data and a messaging queue (RabbitMQ).
-
-## Services
-- Customer Database
-	- Contains customer data (id, first name, last name)
-	- URL: localhost:30001
-- Stations Database
-	- Contains station data (id, db_url, latitude, longitude)
-	- URL: localhost:30002
-- Individual Station Databases
-	- Contains customer station data (id, kwh, customer_id)
-	- URL Station 1: localhost:30011
-	- URL Station 2: localhost:30012
-	- URL Station 3: localhost:30013
-- Queue
-	- URL: localhost:30003
-	- Web: localhost:30083
-
 ## Requirements
 - [Docker](https://docs.docker.com/get-docker/)
 
 ## Start
+
 ```shell
 docker-compose up
 ```
 
-## RabbitMQ-Dashboard
-- [RabbitMQ-Dashboard](http://localhost:30083)
-- Username: guest
-- Password: guest
+- Start all applications in IntelliJ seperately
+- also start JavaFX application to start the invoice PDF generation 
 
-
-## Documentations
-- [RabbitMQ](https://www.rabbitmq.com/tutorials/tutorial-one-java.html)
-
-
-For checking Databases:
-stationsdb:
-docker exec -it semesterproject-station-db-1 psql -U postgres -d stationdb
-station-1-db:
-docker exec -it semesterproject-station-1-db-1 psql -U postgres -d stationdb
+In the JavaFX application:
+- Enter a customerID (1-3)
+- A download button appears: download the invoice.pdf for the selected customer
