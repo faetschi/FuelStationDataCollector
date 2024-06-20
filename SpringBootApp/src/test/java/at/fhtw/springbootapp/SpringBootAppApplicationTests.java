@@ -54,13 +54,17 @@ class SpringBootAppApplicationTests {
     public void testGetEndpoint() throws Exception {
         String customerId = "1";
         String rootDirectory = System.getProperty("user.dir").replace("\\", "/").replace(" ", "%20");
-        String expectedResponse = "file:///" + rootDirectory + "/../FileStorage/invoice_" + customerId +"_1.pdf";
 
         // Create a spy of the InvoiceController
         InvoiceController invoiceControllerSpy = spy(invoiceController);
 
         // Mocking the behavior of findHighestInvoiceCounter method in the spy
-        doReturn(1).when(invoiceControllerSpy).findHighestInvoiceCounter(anyString(), anyString());
+        doReturn(2).when(invoiceControllerSpy).findHighestInvoiceCounter(anyString(), anyString());
+
+        int highestInvoiceNumber = invoiceControllerSpy.findHighestInvoiceCounter(rootDirectory + "/../FileStorage", customerId);
+
+        // Adjust the expectedResponse
+        String expectedResponse = "file:///" + rootDirectory + "/../FileStorage/invoice_" + customerId +"_" + highestInvoiceNumber + ".pdf";
 
         // Perform the GET request
         mockMvc.perform(get("/invoices/" + customerId)

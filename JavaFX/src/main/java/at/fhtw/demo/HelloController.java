@@ -125,7 +125,7 @@ public class HelloController {
                                 return null;
                             });
 
-                    Thread.sleep(1000); // Check every 1 second
+                    Thread.sleep(3000); // Check every 1 second
                 }
             }
         };
