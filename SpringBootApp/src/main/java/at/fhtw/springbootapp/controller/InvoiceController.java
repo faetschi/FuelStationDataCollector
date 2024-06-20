@@ -55,7 +55,7 @@ public class InvoiceController {
         }
     }
 
-    private int findHighestInvoiceCounter(String fileStoragePath, String customerId) {
+    public int findHighestInvoiceCounter(String fileStoragePath, String customerId) {
         try {
             // List all files in the FileStorage directory
             Path directory = Paths.get(fileStoragePath);

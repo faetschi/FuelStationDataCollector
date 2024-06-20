@@ -16,6 +16,10 @@ import static org.mockito.Mockito.*;
 class DataCollectionDispatcherTest {
 
     @Test
+    void contextLoads() {
+    }
+
+    @Test
     void testReceiveMessage() {
         // Arrange
         RabbitTemplate rabbitTemplate = mock(RabbitTemplate.class);
@@ -42,7 +46,4 @@ class DataCollectionDispatcherTest {
         verify(rabbitTemplate, times(1)).convertAndSend(RabbitMQConfig.DATA_COLLECTION_RECEIVER_QUEUE, "New job started");
     }
 
-    @Test
-    void contextLoads() {
-    }
 }
