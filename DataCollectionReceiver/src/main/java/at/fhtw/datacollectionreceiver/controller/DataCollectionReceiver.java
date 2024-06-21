@@ -1,4 +1,4 @@
-package at.fhtw.datacollectionreceiver.services;
+package at.fhtw.datacollectionreceiver.controller;
 
 import at.fhtw.datacollectionreceiver.config.RabbitMQConfig;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -28,24 +28,26 @@ public class DataCollectionReceiver {
 
     @RabbitListener(queues = RabbitMQConfig.SPECIFIC_DATA_COLLECTION_RECEIVER_QUEUE)
     public void handleMessage(String message) {
-        String[] parts = message.split(",");
+        try {
+            String[] parts = message.split(",");
+            double sum = Double.parseDouble(parts[0].split(":")[1]);
+            this.customerId = Integer.parseInt(parts[1].split(":")[1]);
+            int stationPort = Integer.parseInt(parts[2].split(":")[1]);
 
-        double sum = Double.parseDouble(parts[0].split(":")[1]);
-        this.customerId = Integer.parseInt(parts[1].split(":")[1]);
-        int stationPort = Integer.parseInt(parts[2].split(":")[1]);
-
-        processData(sum, customerId, stationPort);
+            processData(sum, customerId, stationPort);
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+            // Log the exception or handle it as per your requirement
+            System.err.println("Invalid message format: " + message);
+        }
     }
 
     private void processData(double sum, int customerId, int stationPort) {
         // Sort the data according to the gathering job
         dataMap.put(stationPort, sum);
 
-        // Check if the data is complete
+
         if (isDataComplete()) {
-            // Send data to the PDF Generator
             sendToPdfGenerator(dataMap);
-            // Clear the dataMap after sending the data
             dataMap.clear();
         }
     }
@@ -56,11 +58,9 @@ public class DataCollectionReceiver {
 
     private void sendToPdfGenerator(Map<Integer, Double> dataMap) {
         try {
-            // Create a new map to include the customerId
             Map<String, Object> messageMap = new HashMap<>();
             messageMap.put("customerId", this.customerId);
             messageMap.put("data", dataMap);
-
             // Convert the messageMap to a JSON string
             String message = objectMapper.writeValueAsString(messageMap);
 

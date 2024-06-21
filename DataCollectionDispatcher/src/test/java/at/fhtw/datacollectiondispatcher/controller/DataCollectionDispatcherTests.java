@@ -1,7 +1,6 @@
-package com.example.datacollectiondispatcher;
+package at.fhtw.datacollectiondispatcher.controller;
 
 import at.fhtw.datacollectiondispatcher.config.RabbitMQConfig;
-import at.fhtw.datacollectiondispatcher.controller.DataCollectionDispatcher;
 import at.fhtw.datacollectiondispatcher.entity.Station;
 import at.fhtw.datacollectiondispatcher.repository.StationRepository;
 import org.junit.jupiter.api.Test;
@@ -13,7 +12,7 @@ import java.util.Map;
 
 import static org.mockito.Mockito.*;
 
-class DataCollectionDispatcherTest {
+class DataCollectionDispatcherTests {
 
     @Test
     void contextLoads() {

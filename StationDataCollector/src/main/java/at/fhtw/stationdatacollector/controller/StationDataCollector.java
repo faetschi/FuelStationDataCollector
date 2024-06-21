@@ -1,4 +1,4 @@
-package at.fhtw.stationdatacollector.services;
+package at.fhtw.stationdatacollector.controller;
 
 import at.fhtw.stationdatacollector.config.DataSourceConfig;
 import at.fhtw.stationdatacollector.config.RabbitMQConfig;

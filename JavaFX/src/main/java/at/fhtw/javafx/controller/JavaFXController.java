@@ -17,6 +17,9 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+
 import javafx.scene.control.TextFormatter;
 import javafx.scene.control.ProgressIndicator;
 
@@ -36,6 +39,9 @@ public class JavaFXController {
     @FXML
     private ProgressIndicator progressIndicator;
 
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private final int TIMEOUT_SECONDS = 9;
+    private final int INITIAL_DELAY = 3000; // Initial delay in milliseconds (3 seconds)
 
     @FXML
     protected void generateInvoice() {
@@ -57,7 +63,6 @@ public class JavaFXController {
         });
         customerIdField.setTextFormatter(numericFormatter);
     }
-
 
     private void sendStartInvoiceRequest(String customerId) {
         HttpRequest request = HttpRequest.newBuilder()
@@ -94,12 +99,15 @@ public class JavaFXController {
                 });
     }
 
-
-
     private void startPeriodicCheck(String customerId) {
         Task<Void> checkTask = new Task<>() {
             @Override
             protected Void call() throws Exception {
+                long startTime = System.currentTimeMillis();
+
+                // Initial delay before first request
+                Thread.sleep(INITIAL_DELAY);
+
                 while (true) {
                     HttpRequest request = HttpRequest.newBuilder()
                             .uri(URI.create(API_URL + customerId))
@@ -125,10 +133,23 @@ public class JavaFXController {
                                 return null;
                             });
 
-                    Thread.sleep(3000); // Check every 1 second
+                    // Check if the timeout period has been exceeded
+                    if (System.currentTimeMillis() - startTime > TIMEOUT_SECONDS * 1000) {
+                        Platform.runLater(() -> {
+                            statusLabel.setText("Timeout: Failed to get invoice status.");
+                            progressIndicator.setVisible(false);
+                        });
+                        cancel(); // Stop periodic checking
+                        break;
+                    }
+
+                    Thread.sleep(3000); // Check every 3 seconds
                 }
+                return null;
             }
         };
+
+        // Start the periodic check task
         new Thread(checkTask).start();
     }
 
@@ -169,6 +190,4 @@ public class JavaFXController {
 
         ((VBox) statusLabel.getParent()).getChildren().add(downloadButton);
     }
-
-
 }

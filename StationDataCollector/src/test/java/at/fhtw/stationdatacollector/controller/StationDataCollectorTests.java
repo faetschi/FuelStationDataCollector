@@ -1,12 +1,11 @@
-package at.fhtw.stationdatacollector;
+package at.fhtw.stationdatacollector.controller;
 
 import at.fhtw.stationdatacollector.config.RabbitMQConfig;
 import at.fhtw.stationdatacollector.entity.ChargeEntity;
-import at.fhtw.stationdatacollector.services.StationDataCollector;
+import at.fhtw.stationdatacollector.controller.StationDataCollector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -33,12 +32,13 @@ public class StationDataCollectorTests {
     @Mock(name = "Db3")
     JdbcTemplate jdbcTemplate3;
 
-    @InjectMocks
+    //@InjectMocks
     StationDataCollector stationDataCollector;
 
     @BeforeEach
     void setUp() {
         reset(rabbitTemplate, jdbcTemplate1, jdbcTemplate2, jdbcTemplate3);
+        stationDataCollector = new StationDataCollector(rabbitTemplate, jdbcTemplate1, jdbcTemplate2, jdbcTemplate3);
     }
 
     @Test
@@ -90,6 +90,32 @@ public class StationDataCollectorTests {
         verify(rabbitTemplate).convertAndSend(
                 eq(RabbitMQConfig.SPECIFIC_DATA_COLLECTION_RECEIVER_QUEUE),
                 eq((Object) "sum:50.8,customerId:2,stationPort:30012")
+        );
+    }
+
+    @Test
+    void testReceiveCustomerData_Db3() {
+        // Mock data for Db3
+        Map<String, String> message = new HashMap<>();
+        message.put("customerId", "3");
+        message.put("dbUrl", "localhost:30013/stationdb");
+
+        List<ChargeEntity> chargeEntities = Arrays.asList(
+                new ChargeEntity(5, 25, 2),
+                new ChargeEntity(6, 35, 2)
+        );
+
+        // Mock jdbcTemplate2 behavior for customerId 2
+        when(jdbcTemplate3.query(anyString(), any(RowMapper.class), eq(3)))
+                .thenReturn(chargeEntities);
+
+        // Call method under test
+        stationDataCollector.receiveCustomerData(message);
+
+        // Verify rabbitTemplate behavior for Db3
+        verify(rabbitTemplate).convertAndSend(
+                eq(RabbitMQConfig.SPECIFIC_DATA_COLLECTION_RECEIVER_QUEUE),
+                eq((Object) "sum:60.0,customerId:3,stationPort:30013")
         );
     }
 

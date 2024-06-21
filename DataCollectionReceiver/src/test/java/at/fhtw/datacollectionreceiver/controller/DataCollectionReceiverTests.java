@@ -1,4 +1,4 @@
-package at.fhtw.datacollectionreceiver.services;
+package at.fhtw.datacollectionreceiver.controller;
 
 import at.fhtw.datacollectionreceiver.config.RabbitMQConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -76,7 +76,7 @@ public class DataCollectionReceiverTests {
     @Test
     void testHandleMessage_InvalidMessage() {
         // Mock data with invalid message
-        String invalidMessage = "invalid:message";
+        String invalidMessage = "sum:asdf,customerId:asdf,stationPart:999999";
 
         dataCollectionReceiver.handleMessage(invalidMessage);
 
