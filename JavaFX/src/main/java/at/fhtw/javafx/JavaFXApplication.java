@@ -10,7 +10,7 @@ public class JavaFXApplication extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("hello-view.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("javafx.fxml"));
         Scene scene = new Scene(root);
         stage.setTitle("Invoice Generator");
         stage.setScene(scene);
