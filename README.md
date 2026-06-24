@@ -1,6 +1,5 @@
 # Fuel Station Data Collector
 ### A Distributed Systems Semester Project
-Made by Fabian Jelinek, Hayk Sargsyan and Marco Hudec
 
 ![Diagram Specification](diagram-specification.png "Diagram Specification")
 
