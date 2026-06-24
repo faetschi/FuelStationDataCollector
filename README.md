@@ -13,9 +13,9 @@ In FuelStationDataCollector, open up the terminal and execute:
 docker-compose up
 ```
 
-- Start all applications in IntelliJ seperately
-- also start JavaFX application to start the invoice PDF generation
+- Start all Java applications seperately
+- Start JavaFX application to start the invoice PDF generation
 
-In the JavaFX application:
+In the UI application:
 - Enter a customerID (e.g. 1-3 are valid)
 - A download button appears: download the invoice.pdf for the selected customer
