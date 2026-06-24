@@ -1,5 +1,4 @@
 # Fuel Station Data Collector
-### A Distributed Systems Semester Project
 
 ![Diagram Specification](diagram-specification.png "Diagram Specification")
 
